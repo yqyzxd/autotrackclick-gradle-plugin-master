@@ -1,0 +1,4 @@
+include ':wind-analytics'
+include ':autotrackclick-gradle-plugin'
+include ':app'
+rootProject.name = "autotrackclick-gradle-plugin-master"

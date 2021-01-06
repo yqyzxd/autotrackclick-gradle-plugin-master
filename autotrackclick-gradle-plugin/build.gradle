@@ -1,0 +1,27 @@
+plugins {
+    id 'groovy'
+}
+
+dependencies{
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'com.android.tools.build:gradle:4.1.1'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+apply plugin:'maven-publish'
+
+publishing{
+    publications{
+        AutoTrackClick(MavenPublication){
+            from components.java  //要把源码生成的jar包上传
+            groupId 'com.wind'
+            artifactId "autotrackclick-gradle-plugin"
+            version "1.0.0"
+        }
+    }
+}
