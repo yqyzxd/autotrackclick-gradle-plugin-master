@@ -10,7 +10,7 @@ class AaalyticsClassInspector {
 
 
     static String path2ClassName(String path) {
-        path.replace(File.seperator, ".").replace(".class", "")
+        path.replace(File.separator, ".").replace(".class", "")
 
     }
 
@@ -37,8 +37,12 @@ class AaalyticsClassInspector {
             byte[] modifiedClassBytes = modifyClass(sourceClassBytes)
             if (modifiedClassBytes) {
                 modified = new File(tempDir, className.replace('.', '/') + '.class')
+                //println(modified)
                 if (modified.exists()) {
                     modified.delete()
+                }
+                if (!modified.getParentFile().exists()){
+                    modified.getParentFile().mkdirs()
                 }
                 modified.createNewFile()
                 new FileOutputStream(modified).write(modifiedClassBytes)

@@ -15,7 +15,19 @@ class MainActivity : AppCompatActivity() {
         with(binding){
             button.setOnClickListener {
                 System.out.println("click me")
+                asmTest()
             }
         }
+
+    }
+
+
+    @ASMTime
+    fun asmTest(){
+
+        for(i in 0..1){
+            println("i:"+i)
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 package com.wind.gradle.plugin.autotrackclick
 
 import com.android.build.api.transform.DirectoryInput
+import com.android.build.api.transform.Context
 import com.android.build.api.transform.Format
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.QualifiedContent
@@ -49,7 +50,7 @@ class AutoTrackClickTransformation extends Transform {
         inputs.each {
             TransformInput input ->
                 //处理目录（自身源码）
-                doDirectoryInputs(input.directoryInputs, outputProvider)
+                doDirectoryInputs(transformInvocation.context,input.directoryInputs, outputProvider)
                 //处理jar包 包括aar
                 doJarInputs(input.jarInputs, outputProvider)
         }
@@ -76,7 +77,7 @@ class AutoTrackClickTransformation extends Transform {
         }
     }
 
-    void doDirectoryInputs(Collection<DirectoryInput> directoryInputs, TransformOutputProvider outputProvider) {
+    void doDirectoryInputs(Context context,Collection<DirectoryInput> directoryInputs, TransformOutputProvider outputProvider) {
         directoryInputs.each {
             DirectoryInput directoryInput ->
                 //目标输出目录
@@ -89,13 +90,34 @@ class AutoTrackClickTransformation extends Transform {
                     //遍历以.class结尾的文件
                     dir.traverse(type: FileType.FILES,nameFilter:~/.*\.class/) {
                         File classFile->
+                            File modified = null
+                            modified=AaalyticsClassInspector.inspectClassFile(dir,classFile,context.getTemporaryDir())
+                            println(getName()+modified.absolutePath)
+                            if (modified!=null){
+                                String key= classFile.absolutePath.replace(dir.absolutePath,"")
+                                println(getName()+key)
+                                modifiedMap.put(key,modified)
+                            }
+                    }
+
+                    //将input目录 复制到dest目录
+                    FileUtils.copyDirectory(directoryInput.file, dest)
+
+                    modifiedMap.entrySet().each{
+                        Map.Entry<String,File> entry->
+                            File target=new File((dest.absolutePath+ entry.getKey()))
+                            if (target.exists()){
+                                target.delete()
+                            }
+                            println("target:"+target.absolutePath)
+                            FileUtils.copyFile(entry.getValue(),target)
+                            entry.getValue().delete()
 
                     }
 
                 }
 
-                //将input目录 复制到dest目录
-                FileUtils.copyDirectory(directoryInput.file, dest)
+
         }
     }
 }
