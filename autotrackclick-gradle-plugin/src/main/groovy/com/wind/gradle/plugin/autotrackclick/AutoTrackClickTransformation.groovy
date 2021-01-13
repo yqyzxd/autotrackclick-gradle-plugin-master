@@ -57,22 +57,27 @@ class AutoTrackClickTransformation extends Transform {
 
     }
 
-    void doJarInputs(Collection<JarInput> jarInputs, TransformOutputProvider outputProvider) {
+    void doJarInputs(Context context,Collection<JarInput> jarInputs, TransformOutputProvider outputProvider) {
         jarInputs.each {
             JarInput jarInput ->
                 //需要重新命名输出文件 同一个目录拷贝会冲突
                 def jarName = jarInput.name
-                def md5Name = DigestUtils.md5Hex(jarInput.file.absolutePath)
+                def md5Name = DigestUtils.md5Hex(jarInput.file.absolutePath).substring(0,8)
                 if (jarName.endsWith(".jar")) {
                     jarName = jarName.substring(0, jarName.length() - 4)
                 }
 
-                File copyJarFile = jarInput.file
+
 
                 //获得输出路径
                 def dest=outputProvider.getContentLocation(jarName + md5Name,
                         jarInput.contentTypes, jarInput.scopes, Format.JAR)
 
+                def modifiedJar=null
+                modifiedJar= AaalyticsClassInspector.inspectJar(jarInput.file,context.getTemporaryDir(),md5Name)
+                if (modifiedJar==null){
+                    modifiedJar = jarInput.file
+                }
                 FileUtils.copyFile(copyJarFile,dest)
         }
     }
@@ -103,6 +108,7 @@ class AutoTrackClickTransformation extends Transform {
                     //将input目录 复制到dest目录
                     FileUtils.copyDirectory(directoryInput.file, dest)
 
+                    //将修改的文件拷贝到目标文件
                     modifiedMap.entrySet().each{
                         Map.Entry<String,File> entry->
                             File target=new File((dest.absolutePath+ entry.getKey()))
@@ -116,8 +122,6 @@ class AutoTrackClickTransformation extends Transform {
                     }
 
                 }
-
-
         }
     }
 }
