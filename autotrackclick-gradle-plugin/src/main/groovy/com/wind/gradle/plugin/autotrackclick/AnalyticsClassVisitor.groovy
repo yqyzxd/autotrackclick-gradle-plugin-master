@@ -8,6 +8,7 @@ import org.objectweb.asm.Opcodes
 class AnalyticsClassVisitor extends ClassVisitor{
 
     private String[] mInterfaces
+    private String mClassName
     AnalyticsClassVisitor( ClassVisitor classVisitor) {
         super(Opcodes.ASM7, classVisitor)
     }
@@ -16,6 +17,7 @@ class AnalyticsClassVisitor extends ClassVisitor{
     void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces)
         mInterfaces=interfaces
+        mClassName=name
     }
 
 
@@ -23,8 +25,8 @@ class AnalyticsClassVisitor extends ClassVisitor{
     @Override
     MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor methodVisitor= super.visitMethod(access, name, descriptor, signature, exceptions)
-
-        methodVisitor=new AnalyticsMethodVisitor(methodVisitor,access,name,descriptor)
+        //println("mClassName->"+mClassName +"  Method name->"+(name+descriptor))
+        methodVisitor=new AnalyticsMethodVisitor(mInterfaces,methodVisitor,access,name,descriptor)
 
         return methodVisitor
     }

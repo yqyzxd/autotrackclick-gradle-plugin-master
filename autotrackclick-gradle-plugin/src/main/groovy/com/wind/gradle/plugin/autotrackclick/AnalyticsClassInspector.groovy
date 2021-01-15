@@ -12,7 +12,7 @@ import java.util.jar.JarOutputStream
 import java.util.regex.Matcher
 
 
-class AaalyticsClassInspector {
+class AnalyticsClassInspector {
 
 
     private static String path2ClassName(String path) {

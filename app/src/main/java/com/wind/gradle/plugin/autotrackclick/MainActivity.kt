@@ -2,6 +2,8 @@ package com.wind.gradle.plugin.autotrackclick
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.CheckBox
+import android.widget.TextView
 import com.hi.dhl.binding.viewbind
 import com.wind.gradle.plugin.autotrackclick.databinding.ActivityMainBinding
 
@@ -14,11 +16,18 @@ class MainActivity : AppCompatActivity() {
        // setContentView(R.layout.activity_main)
         with(binding){
             button.setOnClickListener {
-                System.out.println("click me")
+                println("click me")
                 asmTest()
             }
         }
 
+        var cb= CheckBox(this)
+
+       if ( cb is TextView){
+           println("cb is TextView")
+       }else{
+           println("cb is not TextView")
+       }
     }
 
 

@@ -52,7 +52,7 @@ class AutoTrackClickTransformation extends Transform {
                 //处理目录（自身源码）
                 doDirectoryInputs(transformInvocation.context,input.directoryInputs, outputProvider)
                 //处理jar包 包括aar
-                doJarInputs(input.jarInputs, outputProvider)
+                doJarInputs(transformInvocation.context,input.jarInputs, outputProvider)
         }
 
     }
@@ -74,11 +74,11 @@ class AutoTrackClickTransformation extends Transform {
                         jarInput.contentTypes, jarInput.scopes, Format.JAR)
 
                 def modifiedJar=null
-                modifiedJar= AaalyticsClassInspector.inspectJar(jarInput.file,context.getTemporaryDir(),md5Name)
+                modifiedJar= AnalyticsClassInspector.inspectJar(jarInput.file,context.getTemporaryDir(),md5Name)
                 if (modifiedJar==null){
                     modifiedJar = jarInput.file
                 }
-                FileUtils.copyFile(copyJarFile,dest)
+                FileUtils.copyFile(modifiedJar,dest)
         }
     }
 
@@ -95,12 +95,12 @@ class AutoTrackClickTransformation extends Transform {
                     //遍历以.class结尾的文件
                     dir.traverse(type: FileType.FILES,nameFilter:~/.*\.class/) {
                         File classFile->
-                            File modified = null
-                            modified=AaalyticsClassInspector.inspectClassFile(dir,classFile,context.getTemporaryDir())
-                            println(getName()+modified.absolutePath)
+
+                            File modified=AnalyticsClassInspector.inspectClassFile(dir,classFile,context.getTemporaryDir())
+                           // println(getName()+modified.absolutePath)
                             if (modified!=null){
                                 String key= classFile.absolutePath.replace(dir.absolutePath,"")
-                                println(getName()+key)
+                                //println(getName()+key)
                                 modifiedMap.put(key,modified)
                             }
                     }
@@ -115,7 +115,7 @@ class AutoTrackClickTransformation extends Transform {
                             if (target.exists()){
                                 target.delete()
                             }
-                            println("target:"+target.absolutePath)
+                           // println("target:"+target.absolutePath)
                             FileUtils.copyFile(entry.getValue(),target)
                             entry.getValue().delete()
 
