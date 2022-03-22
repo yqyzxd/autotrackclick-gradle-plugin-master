@@ -8,8 +8,11 @@ import com.android.build.api.transform.Status
 import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformException
 import com.android.build.api.transform.TransformInvocation
+import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.hash.Hashing
+import com.wind.gradle.plugn.MethodTracer
+import com.wind.gradle.plugn.TraceBuildConfig
 import com.wind.gradle.plugn.Util
 import org.apache.commons.compress.utils.Charsets
 
@@ -45,6 +48,7 @@ class SystraceTransform extends Transform {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
 
         final boolean isIncremental = transformInvocation.isIncremental() && this.isIncremental()
+        TransformOutputProvider outputProvider=transformInvocation.outputProvider
         //File temporaryDir = transformInvocation.context.temporaryDir
         //final File rootOutput = temporaryDir
 
@@ -58,7 +62,8 @@ class SystraceTransform extends Transform {
             input.directoryInputs.each { dirInput ->
                 //dirInput 对应的输出位置
                 def outputDir = outputProvider.getContentLocation(dirInput.name,
-                        directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY)
+                        dirInput.contentTypes, dirInput.scopes, Format.DIRECTORY)
+                System.out.println("SystraceTransform outputDir:${outputDir.getAbsolutePath()}");
                 collectAndIdentifyDir(srcInputMap, dirInput, outputDir, isIncremental)
 
 
@@ -68,12 +73,15 @@ class SystraceTransform extends Transform {
                     //获得输出路径
                     def outputJarLocation=outputProvider.getContentLocation(getUniqueJarName(jarInput.file),
                             jarInput.contentTypes, jarInput.scopes, Format.JAR)
+                    System.out.println("SystraceTransform  outputJarLocation:${outputJarLocation.getAbsolutePath()}");
                     collectAndIdentifyJar(jarInputMap, jarInput, outputJarLocation, isIncremental)
                 }
 
             }
         }
-
+        TraceBuildConfig config=new TraceBuildConfig()
+        MethodTracer methodTracer=new MethodTracer(config)
+        methodTracer.trace(srcInputMap,jarInputMap)
     }
 
     private void collectAndIdentifyJar(Map<File, File> jarInputMap, JarInput input, File jarOutput, boolean isIncremental) {

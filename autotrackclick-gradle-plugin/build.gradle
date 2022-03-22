@@ -13,7 +13,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_7
 }
 
-apply plugin:'maven-publish'
+/*apply plugin:'maven-publish'
 
 publishing{
     publications{
@@ -24,4 +24,9 @@ publishing{
             version "1.0.0"
         }
     }
-}
+}*/
+
+version 1.0
+group "com.geektime.systrace"
+
+apply from: rootProject.file('gradle/java-publish.gradle')

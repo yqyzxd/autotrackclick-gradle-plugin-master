@@ -1,8 +1,10 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'com.wind.autotrackclick'
+    //id 'com.wind.autotrackclick'
+    id 'com.geektime.systrace-plugin'
 }
+
 
 android {
     compileSdkVersion 30
